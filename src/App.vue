@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center items-center mt-10">
+  <div class="mt-10 px-20">
     <!-- if (loading) Loading... -->
     <div v-if="loading">Loading...</div>
     
@@ -7,7 +7,7 @@
     <div v-if="error">{{ error.message }}</div>
     
     <!-- if (results) render -->
-    <table class="w-11/12 border-collapse" v-if="result && result.characters && result.characters.results">
+    <table class="w-full border-collapse" v-if="result && result.characters && result.characters.results">
       <thead>
         <tr>
           <th class="border-b-stone-900 border">ID</th>
@@ -29,17 +29,20 @@
         </tr>
       </tbody>
     </table>
+    <div class="flex justify-between">
+      <button @click="handlePrevPage" class="bg-red-200 px-4 py-2 mt-2 rounded-md cursor-pointer hover:bg-red-400 capitalize ">previous page</button>
+      <button class="bg-amber-300 px-4 py-2 mt-2 rounded-md cursor-auto capitalize">current page: {{ pageNumber }}</button>
+      <button @click="handleNextPage" class="bg-red-200 px-4 py-2 mt-2 rounded-md cursor-pointer hover:bg-red-400 capitalize">next page</button>
+    </div>
   </div>
 </template>
 
 
 <script lang="ts">
-import { defineComponent, computed, watch } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
-
+import { defineComponent, computed, ref, Ref } from 'vue';
+import { useFetchData } from './composables/useFetchCharacters';
 // Types 
-import { Character } from './types/index';
+import { Character, Species } from './types/index';
 
 export default defineComponent({
   name: 'App', 
@@ -48,31 +51,34 @@ export default defineComponent({
   },
   setup(){
 
-    const { result, loading, error } = useQuery(gql`
-      query getCharacters {
-      characters (filter: {species: value}){
-      results{
-      id 
-      name
-      status
-      species
-      type
-      gender
-    }
-  }
-  }
-`);
-
-    watch(result, (newVal) => {console.log(newVal);}, {immediate: true});
-
+    // dinamic filter value
+    const filterBy: Ref<Species> = ref(Species.human); 
     
+    // dinamic page value
+    const pageNumber = ref(1);
+    
+    const handlePrevPage = () => {
+      pageNumber.value > 1 ? pageNumber.value -= 1 : null; 
+    };
+
+    const handleNextPage = () => {
+      if (result.value) {
+        pageNumber.value += 1;
+      }
+    };
+
+    // useFetchCharacters
+    const { result, error, loading } = useFetchData({page: pageNumber, filterVal: filterBy});
     const characters = computed<Character[]>(() => result.value.characters.results || []);
   
     return {
       result,
       characters,
       loading, 
-      error
+      error,
+      handlePrevPage,
+      handleNextPage,
+      pageNumber
     };
   }
 });

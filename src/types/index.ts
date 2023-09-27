@@ -6,3 +6,8 @@ export type Character = {
     type: string;
     gender: string; 
 }
+
+export enum Species {
+    human = 'human',
+    alien = 'alien',
+}
