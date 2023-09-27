@@ -62,7 +62,8 @@ export default defineComponent({
     };
 
     const handleNextPage = () => {
-      if (result.value) {
+      // if result is empty meaning no characters STOP going forward
+      if (characters.value.length > 0) {
         pageNumber.value += 1;
       }
     };
@@ -70,7 +71,7 @@ export default defineComponent({
     // useFetchCharacters
     const { result, error, loading } = useFetchData({page: pageNumber, filterVal: filterBy});
     const characters = computed<Character[]>(() => result.value.characters.results || []);
-  
+
     return {
       result,
       characters,
