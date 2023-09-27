@@ -37,7 +37,7 @@ export const useFetchData = ({ page, filterVal }: UseFetchDataParams) => {
       }
       }
       `, variables, {
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-first'
   });
 
   // Watch for changes in page and filterVal and update variables accordingly

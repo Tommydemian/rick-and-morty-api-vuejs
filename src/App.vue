@@ -7,6 +7,7 @@
     <div v-if="error">{{ error.message }}</div>
     
     <!-- if (results) render -->
+    <transition name="fade" mode="out-in">
     <table class="w-full border-collapse" v-if="result && result.characters && result.characters.results">
       <thead>
         <tr>
@@ -29,6 +30,7 @@
         </tr>
       </tbody>
     </table>
+  </transition>
     <div class="flex justify-between">
       <button @click="handlePrevPage" class="bg-red-200 px-4 py-2 mt-2 rounded-md cursor-pointer hover:bg-red-400 capitalize ">previous page</button>
       <button class="bg-amber-300 px-4 py-2 mt-2 rounded-md cursor-auto capitalize">current page: {{ pageNumber }}</button>
@@ -51,16 +53,14 @@ export default defineComponent({
   },
   setup(){
 
-    // dinamic filter value
+    // Ref
     const filterBy: Ref<Species> = ref(Species.human); 
-    
-    // dinamic page value
     const pageNumber = ref(1);
     
+    // Prev and Next page
     const handlePrevPage = () => {
       pageNumber.value > 1 ? pageNumber.value -= 1 : null; 
     };
-
     const handleNextPage = () => {
       // if result is empty meaning no characters STOP going forward
       if (characters.value.length > 0) {
@@ -87,4 +87,12 @@ export default defineComponent({
 
 </script>
 
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
+}
+</style>
 
